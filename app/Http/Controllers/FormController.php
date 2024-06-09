@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
 use App\Models\Company;
+use App\Models\OwnershipTypes;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,8 +14,8 @@ class FormController extends Controller
 {
     public function showForm()
     {
-        $companies = Company::all(); // Получаем список компаний
-        return view('main', ['companies' => $companies]);
+        $ownershipTypes = OwnershipTypes::all(); // Получаем список компаний
+        return view('main', ['ownershipTypes' => $ownershipTypes]);
     }
     // Добавляем middleware auth
     public function __construct()
@@ -30,16 +32,18 @@ class FormController extends Controller
             'full_name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
-            'company' => 'required|string',
+            'company' => 'required|string|max:255',
             'amount' => 'required|numeric',
             'term' => 'required|integer|min:1',
             'repayment_period' => 'required|integer|min:1',
         ]);
 
-
         $validated['user_id'] = $userId;
 
-        Post::create($validated);
+        // Проверяем существует ли компания с таким названием
+        $company = Company::firstOrCreate(['name' => $validated['company']]);
+
+        Client::create($validated);
         $amount = $request->amount;
         $term = $request->term;
         $repaymentPeriod = $request->repayment_period;
@@ -63,9 +67,8 @@ class FormController extends Controller
         $credit->loan_date = now();
         $credit->interest_rate = $interestRate;
         $credit->monthly_payment = $monthlyPayment;
-        $credit->company_id = $request->input('company');
+        $credit->company_id = $company->id; // Используем id компании
         $credit->save();
-
 
         return view('confirmation', ['credit' => $credit]);
     }

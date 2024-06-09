@@ -27,13 +27,21 @@
                     <input type="text" class="form-control" id="phone" name="phone" placeholder="Телефон" required>
                 </div>
                 <div class="form-group">
-                    <label for="company" class="sr-only">Выберите компанию</label>
-                    <select class="form-control" id="company" name="company" required>
-                        <option value="" disabled selected>Выберите компанию</option>
-                        @foreach($companies as $company)
-                            <option value="{{ $company->id }}">{{ $company->name }}</option>
+                    <label for="company" class="sr-only">Название компании</label>
+                    <input type="text" class="form-control" id="company" name="company" placeholder="Название компании" required>
+                </div>
+                <div class="form-group">
+                    <label for="ownership_types" class="sr-only">Вид собственности</label>
+                    <select class="form-control" id="ownership_types" name="ownership_types" required>
+                        <option value="" disabled selected>Выберите вид собственности</option>
+                        @foreach($ownershipTypes as $type)
+                            <option value="{{ $type->id }}">{{ $type->name }}</option>
                         @endforeach
                     </select>
+                </div>
+                <div class="form-group">
+                    <label for="company_address" class="sr-only">Адрес компании</label>
+                    <input type="text" class="form-control" id="company_address" name="company_address" placeholder="Адрес компании" required>
                 </div>
                 <div class="form-group">
                     <label for="term" class="sr-only">Срок кредита (в месяцах)</label>

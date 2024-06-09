@@ -11,8 +11,13 @@ class Company extends Model
 
     protected $fillable = ['name'];
 
+    public function ownershipType()
+    {
+        return $this->belongsTo(OwnershipTypes::class, 'ownership_types_id');
+    }
+
     public function credits()
     {
-        return $this->hasMany(Credit::class,'company_id','id');
+        return $this->hasMany(Credit::class, 'company_id');
     }
 }

@@ -20,6 +20,8 @@ return new class extends Migration
             $table->decimal('interest_rate', 5, 2);
             $table->decimal('monthly_payment', 10, 2);
             $table->date('loan_date');
+            $table->unsignedBigInteger('company_id'); // Добавляем поле company_id
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade'); // Связываем с таблицей companies
             $table->timestamps();
         });
 
