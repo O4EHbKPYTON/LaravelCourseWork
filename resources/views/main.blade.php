@@ -32,12 +32,13 @@
                 </div>
                 <div class="form-group">
                     <label for="ownership_types" class="sr-only">Вид собственности</label>
-                    <select class="form-control" id="ownership_types" name="ownership_types" required>
+                    <select class="form-control" id="ownership_type" name="ownership_type" required>
                         <option value="" disabled selected>Выберите вид собственности</option>
                         @foreach($ownershipTypes as $type)
                             <option value="{{ $type->id }}">{{ $type->name }}</option>
                         @endforeach
                     </select>
+
                 </div>
                 <div class="form-group">
                     <label for="company_address" class="sr-only">Адрес компании</label>

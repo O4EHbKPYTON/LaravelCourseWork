@@ -33,15 +33,22 @@ class FormController extends Controller
             'address' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'company' => 'required|string|max:255',
+            'company_address' => 'required|string|max:255',
             'amount' => 'required|numeric',
             'term' => 'required|integer|min:1',
             'repayment_period' => 'required|integer|min:1',
+            'ownership_type' => 'required|exists:ownership_types,id'
         ]);
 
         $validated['user_id'] = $userId;
 
         // Проверяем существует ли компания с таким названием
-        $company = Company::firstOrCreate(['name' => $validated['company']]);
+        $company = Company::firstOrCreate([
+            'name' => $validated['company'],
+            'company_address' => $validated['company_address'],
+        ]);
+        $company->ownership_types_id = $request->input('ownership_type'); // Устанавливаем id типа собственности
+        $company->save();
 
         Client::create($validated);
         $amount = $request->amount;
