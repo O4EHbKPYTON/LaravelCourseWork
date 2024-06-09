@@ -2,61 +2,90 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use App\Models\Post;
-use App\Models\Responsible;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Credit;
 
 class FormController extends Controller
 {
     public function showForm()
     {
-        $responsibles = Responsible::all();
-        $randomResponsible = $responsibles->random();
-
-        return view('main', compact('responsibles', 'randomResponsible'));
+        $companies = Company::all(); // Получаем список компаний
+        return view('main', ['companies' => $companies]);
+    }
+    // Добавляем middleware auth
+    public function __construct()
+    {
+        $this->middleware('auth');
     }
 
-    public function submit(Request $request): \Illuminate\Http\RedirectResponse
+    public function submit(Request $request)
     {
+        // Получаем id текущего пользователя
+        $userId = auth()->id();
+
         $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'patronymic' => 'nullable|string|max:255',
-            'passport' => 'required|string|max:11|regex:/^\d{4} \d{6}$/',
-            'phone' => 'required|string|regex:/^\+7 \(\d{3}\) \d{3}-\d{4}$/',
-            'amount' => 'required|numeric',
-            'term' => 'required|integer',
+            'full_name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
-            'company' => 'required|string|max:255',
-            'responsible_id' => 'required|integer|exists:responsibles,id',
+            'phone' => 'required|string|max:20',
+            'company' => 'required|string',
+            'amount' => 'required|numeric',
+            'term' => 'required|integer|min:1',
+            'repayment_period' => 'required|integer|min:1',
         ]);
 
-        $interest_rate = $this->getInterestRate($validated['term']);
-        $monthly_payment = $this->calculateMonthlyPayment($validated['amount'], $interest_rate, $validated['term']);
-        $validated['monthly_payment'] = $monthly_payment;
-        $validated['user_id'] = Auth::id();
+
+        $validated['user_id'] = $userId;
 
         Post::create($validated);
+        $amount = $request->amount;
+        $term = $request->term;
+        $repaymentPeriod = $request->repayment_period;
 
-        return redirect()->route('credit.form')->with('success', 'Ваша заявка успешно отправлена!');
-    }
-
-    private function calculateMonthlyPayment($amount, $interest_rate, $term)
-    {
-        $monthly_interest_rate = ($interest_rate / 100) / 12;
-        $denominator = 1 - pow(1 + $monthly_interest_rate, -$term);
-        return ($amount * $monthly_interest_rate) / $denominator;
-    }
-
-    private function getInterestRate($term)
-    {
-        if ($term <= 12) {
-            return 10;
+        if ($term <= 6) {
+            $interestRate = 20;
+        } elseif ($term <= 12) {
+            $interestRate = 15;
         } elseif ($term <= 24) {
-            return 12;
+            $interestRate = 10;
         } else {
-            return 15;
+            $interestRate = 5;
         }
+
+        $monthlyPayment = $this->calculateMonthlyPayment($amount, $term, $interestRate);
+
+        $credit = new Credit();
+        $credit->user_id = Auth::id();
+        $credit->loan_amount = $amount;
+        $credit->term = $term;
+        $credit->loan_date = now();
+        $credit->interest_rate = $interestRate;
+        $credit->monthly_payment = $monthlyPayment;
+        $credit->company_id = $request->input('company');
+        $credit->save();
+
+
+        return view('confirmation', ['credit' => $credit]);
+    }
+    private function calculateMonthlyPayment($amount, $term, $interestRate)
+    {
+        // Процентная ставка в абсолютном значении (например, 10% ставка = 0.1)
+        $monthlyInterestRate = $interestRate / 100 / 12;
+
+        // Количество платежей (в месяцах)
+        $totalPayments = $term;
+
+        // Формула для расчета ежемесячного платежа
+        // M = P * (r * (1 + r)^n) / ((1 + r)^n - 1)
+        // где:
+        // M - ежемесячный платеж
+        // P - сумма кредита
+        // r - месячная процентная ставка
+        // n - общее количество платежей
+        $monthlyPayment = $amount * ($monthlyInterestRate * pow(1 + $monthlyInterestRate, $totalPayments)) / (pow(1 + $monthlyInterestRate, $totalPayments) - 1);
+
+        return round($monthlyPayment, 2); // Округляем до двух знаков после запятой
     }
 }
