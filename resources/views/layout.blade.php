@@ -48,9 +48,12 @@
 <header class="masthead mb-auto">
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
         <nav class="my-2 my-md-0 mr-md-3">
-            <a class="p-2 text-dark" href="/">Оформление кредита</a>
-            <a class="p-2 text-dark" href="{{ route('account') }}">Личный кабинет</a> <!-- Добавленная ссылка -->
-
+            @role('admin')
+            <a class="p-2 text-dark" href="{{ route('admin.credits') }}">Данные о кредитах</a>
+            @else
+                <a class="p-2 text-dark" href="/">Оформление кредита</a>
+                @endrole
+                <a class="p-2 text-dark" href="{{ route('account') }}">Личный кабинет</a>
         </nav>
         @guest
             <a class="btn btn-outline-primary" href="{{ route('login') }}">Вход</a>
@@ -66,7 +69,6 @@
         @endguest
     </div>
 </header>
-
 
 @yield('main')
 

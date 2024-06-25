@@ -20,4 +20,10 @@ class AccountController extends Controller
 
         return view('account', compact('credits'));
     }
+
+    public function adminCredits()
+    {
+        $credits = Credit::with('user')->get();
+        return view('admin.credits', ['credits' => $credits]);
+    }
 }

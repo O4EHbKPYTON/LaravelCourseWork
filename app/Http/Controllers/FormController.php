@@ -5,19 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\Company;
 use App\Models\OwnershipTypes;
-use App\Models\Post;
+use App\Models\Credit;
+use App\Models\Payment; // Добавляем модель Payment
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Credit;
 
 class FormController extends Controller
 {
-    public function showForm()
-    {
-        $ownershipTypes = OwnershipTypes::all(); // Получаем список компаний
-        return view('main', ['ownershipTypes' => $ownershipTypes]);
-    }
-    // Добавляем middleware auth
+        public function showForm()
+        {
+            $ownershipTypes = OwnershipTypes::all();
+            return view('main', ['ownershipTypes' => $ownershipTypes]);
+        }
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -42,7 +42,6 @@ class FormController extends Controller
 
         $validated['user_id'] = $userId;
 
-        // Проверяем существует ли компания с таким названием
         $company = Company::firstOrCreate([
             'name' => $validated['company'],
             'company_address' => $validated['company_address'],
@@ -79,6 +78,30 @@ class FormController extends Controller
 
         return view('confirmation', ['credit' => $credit]);
     }
+
+    public function makePayment(Request $request)
+    {
+        $validated = $request->validate([
+            'credit_id' => 'required|exists:credits,id',
+        ]);
+
+        $credit = Credit::findOrFail($validated['credit_id']);
+
+        // Создаем запись о платеже
+        Payment::create([
+            'credit_id' => $credit->id,
+            'company_id' => $credit->company_id,
+            'required_amount' => $credit->loan_amount, // Общая сумма кредита
+            'paid_amount' => $credit->loan_amount, // Считаем, что клиент оплатил всю сумму
+        ]);
+
+        // Помечаем кредит как оплаченный (опционально)
+        $credit->paid = true; // Предполагаем, что у вас есть поле `paid` в таблице `credits`
+        $credit->save();
+
+        return redirect()->back()->with('success', 'Платеж успешно зарегистрирован.');
+    }
+
     private function calculateMonthlyPayment($amount, $term, $interestRate)
     {
         // Процентная ставка в абсолютном значении (например, 10% ставка = 0.1)

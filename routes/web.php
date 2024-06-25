@@ -1,18 +1,16 @@
 <?php
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
+// routes/web.php
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\AccountController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('main');
-})->name('credit.form');
 Route::get('/', [FormController::class, 'showForm'])->name('credit.form');
 Route::post('/formSubmit', [FormController::class, 'submit'])->name('form.submit');
 
-// Добавьте это, если у вас еще нет Auth маршрутов
 Auth::routes();
 
-// Добавляем маршрут для личного кабинета
 Route::get('/account', [AccountController::class, 'index'])->name('account')->middleware('auth');
+Route::post('/makePayment', [FormController::class, 'makePayment'])->name('make_payment')->middleware('auth');
+Route::get('/admin/credits', [AccountController::class, 'adminCredits'])->name('admin.credits')->middleware('role:admin');

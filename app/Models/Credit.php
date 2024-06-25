@@ -18,6 +18,11 @@ class Credit extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function client()
+    {
+        return $this->belongsTo(Client::class,'user_id','id');
+    }
+
     public function company()
     {
         return $this->belongsTo(Company::class,'company_id','id');
