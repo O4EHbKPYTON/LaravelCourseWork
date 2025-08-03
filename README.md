@@ -1,13 +1,13 @@
 # LoanLaravel - Кредитная информационная система
 
-<img width="1893" height="868" alt="Интерфейс системы" src="https://github.com/user-attachments/assets/f4fd4300-c5da-44d2-984e-5046ee8f8c6a">
-
 ![Laravel](https://img.shields.io/badge/Laravel-10.x-FF2D20?logo=laravel&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-8.1+-777BB4?logo=php&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.x-7952B3?logo=bootstrap&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-4.x-646CFF?logo=vite&logoColor=white)
 ![Spatie](https://img.shields.io/badge/Spatie_Permissions-6.7-4A4A4A?logo=laravel)
+<img width="1893" height="868" alt="Интерфейс системы" src="https://github.com/user-attachments/assets/f4fd4300-c5da-44d2-984e-5046ee8f8c6a">
+
 
 **Курсовая работа по дисциплине "Базы данных"**  
 *Демонстрация проектирования нормализованной реляционной БД и реализации информационной системы*
