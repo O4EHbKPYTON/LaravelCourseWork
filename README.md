@@ -1,66 +1,102 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# LoanLaravel - Кредитная информационная система
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+<img width="1893" height="868" alt="Интерфейс системы" src="https://github.com/user-attachments/assets/f4fd4300-c5da-44d2-984e-5046ee8f8c6a">
 
-## About Laravel
+![Laravel](https://img.shields.io/badge/Laravel-10.x-FF2D20?logo=laravel&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP-8.1+-777BB4?logo=php&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.x-7952B3?logo=bootstrap&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-4.x-646CFF?logo=vite&logoColor=white)
+![Spatie](https://img.shields.io/badge/Spatie_Permissions-6.7-4A4A4A?logo=laravel)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**Курсовая работа по дисциплине "Базы данных"**  
+*Демонстрация проектирования нормализованной реляционной БД и реализации информационной системы*
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Нормализованная структура БД
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```mermaid
+erDiagram
+    users ||--o{ credits : "оформляет"
+    users {
+        int id PK
+        string name
+        string email
+        string password
+    }
+    
+    clients ||--o{ credits : "имеет"
+    clients {
+        int id PK
+        string full_name
+        string phone
+        string address
+    }
+    
+    companies ||--o{ credits : "выдает"
+    companies {
+        int id PK
+        string name
+        string address
+        int ownership_type_id FK
+    }
+    
+    ownership_types ||--o{ companies : "классифицирует"
+    ownership_types {
+        int id PK
+        string name
+    }
+    
+    credits ||--o{ payments : "имеет"
+    credits {
+        int id PK
+        int user_id FK
+        int client_id FK
+        int company_id FK
+        decimal amount
+        int term
+        decimal interest_rate
+        decimal monthly_payment
+    }
+    
+    payments {
+        int id PK
+        int credit_id FK
+        decimal amount
+        date payment_date
+    }
+```
+##  Запуск проекта
 
-## Learning Laravel
+```bash
+# 1. Клонирование репозитория
+git clone https://github.com/your-username/LoanLaravel.git
+cd LoanLaravel
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+# 2. Установка зависимостей PHP
+composer install --ignore-platform-reqs
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+# 3. Установка зависимостей Node.js
+npm install
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# 4. Настройка окружения
+cp .env.example .env
+php artisan key:generate
 
-## Laravel Sponsors
+# 5. Редактирование .env файла (настройте под свою БД)
+nano .env  # или открыть в любом редакторе
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# 6. Создание базы данных (если не создана)
+mysql -u root -p -e "CREATE DATABASE laravel_credit;"
 
-### Premium Partners
+# 7. Запуск миграций с тестовыми данными
+php artisan migrate --seed
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+# 8. Сборка фронтенда (в development режиме)
+npm run dev
 
-## Contributing
+# 9. Запуск сервера (в отдельном терминале)
+php artisan serve
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# 10. Доступ к приложению
+http://localhost:8000
+```
